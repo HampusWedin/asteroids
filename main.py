@@ -4,6 +4,7 @@
 import pygame
 from constants import *
 from player import *
+from asteroidfield import *
 
 def main():
     pygame.init()
@@ -13,14 +14,34 @@ def main():
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     dt = 0
     clock = pygame.time.Clock()
-    running = True
+    
+    # create groups
+    updateable =  pygame.sprite.Group()
+    drawable = pygame.sprite.Group()
+    asteroids = pygame.sprite.Group()
+    
+    # add Player class to groups
+    Player.containers = (updateable, drawable)
+    Asteroid.containers = (updateable, drawable, asteroids)
+    AsteroidField.containers = (updateable)
+    # create Player instances
     player_ship = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT /2)
+    asteroid_field = AsteroidField()
+
+    running = True
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+
         screen.fill("black")
-        player_ship.draw(screen)
+        
+        for obj in drawable:
+            obj.draw(screen)
+    
+        for obj in updateable:
+            obj.update(dt)
+
         pygame.display.flip()
         dt = clock.tick(60) / 1000
 
